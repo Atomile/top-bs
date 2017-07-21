@@ -37,12 +37,26 @@ router.get('/getnews/:type', function (req, res, next) {
 router.post('/topic', function (req, res, next) {
     console.log(req.body);
     let sql = 'insert into topic set ?';
-    mysql.query(sql,req.body,(err,result)=>{
-        if(!err){
+    mysql.query(sql, req.body, (err, result) => {
+        if (!err) {
             return res.send({
                 success: true
             })
-        }else{
+        } else {
+            console.log(err);
+        }
+    })
+});
+//评论回复数(热度)加1
+router.post('/topic/add_rply', function (req, res, next) {
+    console.log(req.body.id);
+    let sql = 'update topic set rp_count=rp_count+1 where t_id=?';
+    mysql.query(sql, req.body.id, (err, result) => {
+        if (!err) {
+            return res.send({
+                success: true
+            })
+        } else {
             console.log(err);
         }
     })
@@ -51,16 +65,16 @@ router.post('/topic', function (req, res, next) {
 router.post('/topic/vote', function (req, res, next) {
     console.log(req.body);
     let sql = '';
-    if(req.body.type){
+    if (req.body.type) {
         sql = 'update topic set vote_up=vote_up+1 where t_id=?';
-    }else{
+    } else {
         sql = 'update topic set vote_down=vote_down+1 where t_id=?';
     }
-    mysql.query(sql,req.body.id,function(err,result){
-        if(!err){
+    mysql.query(sql, req.body.id, function (err, result) {
+        if (!err) {
             console.log(result);
-            return res.send({success:true})
-        }else{
+            return res.send({success: true})
+        } else {
             console.log(err);
         }
     });
@@ -72,6 +86,18 @@ router.get('/topic/:news_id', function (req, res, next) {
     mysql.query(sql, req.params.news_id, (err, results) => {
         if (!err) {
             return res.send({data: results})
+        } else {
+            console.log(err);
+        }
+    })
+});
+//获取某个评论的所有子评论
+router.get('/topic/children/:t_id', function (req, res, next) {
+    let sql = 'select * from topic where t_to_t=?';
+    mysql.query(sql, req.params.t_id, (err, results) => {
+        if (!err) {
+            console.log(results);
+            return res.send({data: results});
         } else {
             console.log(err);
         }
