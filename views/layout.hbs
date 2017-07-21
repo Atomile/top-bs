@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{{title}}</title>
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
+</head>
+<body>
+{{{body}}}
+</body>
+<script src="javascripts/jquery-2.1.4.min.js"></script>
+<script>
+    //    *        1 =>  头条
+    //    *        2 =>  娱乐
+    //    *        3 =>  军事
+    //    *        4 =>  汽车
+    //    *        5 =>  财经
+    //    *        6 =>  笑话
+    //    *        7 =>  体育
+    //    *        8 =>  科技
+    var type = {
+        1 : 'toutiao',
+        2 : 'yule',
+        3 : 'junshi',
+        4 : 'qiche',
+        5 : 'caijing',
+        6 : 'xiaohua',
+        7 : 'tiyu',
+        8 : 'keji',
+    }
+    var page = 1;               // 页码
+    var tableNum = 1;           // 类型
+    setInterval(function(){     // 下载不同类型的最新新闻，传给数据库
+        $.getJSON('http://api.dagoogle.cn/news/get-news?tableNum='+tableNum
+                +'&pagesize=6&callback=?&justList=0&page='+page, function (res) {
+            $.each(res.data, function (i) {
+                res.data[i].edit_time = getLocalTime(res.data[i].edit_time);
+                res.data[i].type = type[tableNum];
+                delete res.data[i].text_image1;
+                delete res.data[i].reply_count;
+            });
+            $.ajax({
+                url:'/toutiao',
+                data:JSON.stringify(res.data),
+                type:'POST',
+                contentType:'application/json;charset=utf-8',
+                success:function (res) {
+                    tableNum = ++tableNum>8? 1 : tableNum;
+                    console.log(res,'页码：'+page,'类型：'+tableNum);
+                }
+            });
+        });
+    },3000)
+
+//    下载数据——平时不用
+
+//    setInterval(function(){     // 下载不同类型的最新新闻，传给数据库
+//        $.getJSON('http://api.dagoogle.cn/news/get-news?tableNum='+tableNum
+//                +'&pagesize=6&callback=?&justList=0&page='+page, function (res) {
+//            $.each(res.data, function (i) {
+//                res.data[i].edit_time = getLocalTime(res.data[i].edit_time);
+//                res.data[i].type = type[tableNum];
+//                delete res.data[i].text_image1;
+//                delete res.data[i].reply_count;
+//            });
+//            $.ajax({
+//                url:'/toutiao',
+//                data:JSON.stringify(res.data),
+//                type:'POST',
+//                contentType:'application/json;charset=utf-8',
+//                success:function (res) {
+//                    tableNum = ++tableNum>8? 1 : tableNum;
+//                    console.log(res,'页码：'+page,'类型：'+tableNum);
+//                }
+//            });
+//        });
+//    },3000)
+
+
+    function getLocalTime(nS) {
+        return new Date(parseInt(nS) * 1000).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
+    }
+</script>
+</html>
