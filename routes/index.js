@@ -104,6 +104,8 @@ router.get('/topic/children/:t_id', function (req, res, next) {
     })
 });
 //获取视频
+/// ************ huo qu jie xian*************
+/// ************ shan shu shi pin guang gao*************
 router.get('/video/:number', function (req, res) {
     var c = req.params.number;
     console.log(c);

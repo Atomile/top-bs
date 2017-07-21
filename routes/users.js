@@ -5,15 +5,45 @@ var mysql = require('../mysql/conn');
 //请求实时新闻
 router.get('/', function (req, res) {
     console.log(1);
+
     // 请求 req
     // 相应 res
-    mysql.query('SELECT * FROM news WHERE TYPE = \'junshi\' OR TYPE = \'keji\' OR TYPE = \'caijing\'', (err, results) => {
+    mysql.query("SELECT * FROM news WHERE TYPE = 'junshi' OR TYPE = 'keji' OR " +
+        "TYPE = 'caijing' ORDER BY news_id DESC LIMIT 17", (err, results) => {
         if (err) {
             console.log(err);
         } else {
-            // console.log(results);
-            console.log(results);
             return res.send({data: results});
+        }
+    });
+});
+
+router.get('/:page', function (req, res) {
+    let page = req.params.page;
+    let size = 15;
+
+    mysql.query("SELECT * FROM news WHERE TYPE = 'junshi' OR TYPE = 'keji' OR " +
+        "TYPE = 'caijing' ORDER BY news_id DESC LIMIT ?,?", [page*size, size], (err, results) => {
+        console.log(page*size, size)
+        if (err) {
+            console.log(err);
+        } else {
+            return res.send({data: results});
+        }
+    });
+});
+
+//根据关键字查找新闻
+router.get('/:val', function(req, res) {
+    var val =req.params.val;
+    // 请求 req
+    // 相应 res
+    mysql.query("SELECT * FROM news WHERE title LIKE '%"+val+"%'",(err,results)=>{
+        if (err) {
+            console.log(err);
+        }else{
+            console.log(results);
+            return res.send({data:results});
         }
     });
 });
