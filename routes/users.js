@@ -23,8 +23,8 @@ router.get('/:page', function (req, res) {
     let size = 15;
 
     mysql.query("SELECT * FROM news WHERE TYPE = 'junshi' OR TYPE = 'keji' OR " +
-        "TYPE = 'caijing' ORDER BY news_id DESC LIMIT ?,?", [page*size, size], (err, results) => {
-        console.log(page*size, size)
+        "TYPE = 'caijing' ORDER BY news_id DESC LIMIT ?,?", [page * size, size], (err, results) => {
+        console.log(page * size, size)
         if (err) {
             console.log(err);
         } else {
@@ -34,19 +34,26 @@ router.get('/:page', function (req, res) {
 });
 
 //根据关键字查找新闻
-router.get('/:val', function(req, res) {
-    var val =req.params.val;
+router.get('/:val', function (req, res) {
+    var val = req.params.val;
     // 请求 req
     // 相应 res
-    mysql.query("SELECT * FROM news WHERE title LIKE '%"+val+"%'",(err,results)=>{
+    mysql.query("SELECT * FROM news WHERE title LIKE '%" + val + "%'", (err, results) => {
         if (err) {
             console.log(err);
-        }else{
+        } else {
             console.log(results);
-            return res.send({data:results});
+            return res.send({data: results});
         }
     });
 });
+
+// 收藏某条新闻
+router.post('/news', function (req, res) {
+    mysql.query('insert into collect set ?', req.body, (err, result) => {
+        err ? console.log(err.message) : res.send({success: true});
+    })
+})
 
 // 新用户注册
 router.post('/', function (req, res, next) {
