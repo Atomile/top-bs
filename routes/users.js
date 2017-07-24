@@ -55,6 +55,18 @@ router.post('/ishas', function (req, res) {
         })
 })
 
+// 查询个人的收藏
+router.get('/my_coll/:mobile', function (req, res) {
+    mysql.query('select * from collect c LEFT JOIN news n on n.news_id=c.news_id where mobile=?',
+        req.params.mobile, (err, result) => {
+            if (result.length > 0) {
+                res.send({result: result});
+            } else {
+                res.send({result: false})
+            }
+        })
+})
+
 // 收藏某条新闻
 router.post('/news', function (req, res) {
     mysql.query('insert into collect set ?', req.body, (err, result) => {
@@ -82,7 +94,6 @@ router.post('/', function (req, res, next) {
     }
     reg['email'] = reg['email'].toLowerCase();
     delete reg['password'];
-    console.log(reg['password'])
     // 写入到 user 表
     mysql.query(`select * from login where username=?`, reg.username, (err, result) => {
         if (result[0]) {            // 检测用户名
