@@ -57,7 +57,8 @@ router.post('/ishas', function (req, res) {
 
 // 查询个人的收藏
 router.get('/my_coll/:mobile', function (req, res) {
-    mysql.query('select * from collect c LEFT JOIN news n on n.news_id=c.news_id where mobile=?',
+    mysql.query(`select * from collect c LEFT JOIN news n on 
+        n.news_id=c.news_id where mobile=? order by c.news_id desc`,
         req.params.mobile, (err, result) => {
             if (result.length > 0) {
                 res.send({result: result});
