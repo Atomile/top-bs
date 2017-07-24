@@ -4,10 +4,6 @@ var mysql = require('../mysql/conn');
 
 //请求实时新闻
 router.get('/', function (req, res) {
-    console.log(1);
-
-    // 请求 req
-    // 相应 res
     mysql.query("SELECT * FROM news WHERE TYPE = 'junshi' OR TYPE = 'keji' OR " +
         "TYPE = 'caijing' ORDER BY news_id DESC LIMIT 17", (err, results) => {
         if (err) {
@@ -36,8 +32,6 @@ router.get('/page/:page', function (req, res) {
 //根据关键字查找新闻
 router.get('/:val', function (req, res) {
     var val = req.params.val;
-    // 请求 req
-    // 相应 res
     mysql.query("SELECT * FROM news WHERE title LIKE '%" + val + "%'", (err, results) => {
         if (err) {
             console.log(err);
@@ -69,7 +63,6 @@ router.post('/news', function (req, res) {
 })
 // 取消收藏某条新闻
 router.post('/del_collect', function (req, res) {
-    console.log(req.body)
     mysql.query('delete from collect where mobile=? and news_id=?',
         [req.body.mobile, req.body.news_id], (err, result) => {
             err ? res.send({success: false}) : res.send({success: true});
@@ -77,7 +70,6 @@ router.post('/del_collect', function (req, res) {
 })
 // 新用户注册
 router.post('/', function (req, res, next) {
-    console.log(123);
     // 处理数据
     let reg = req.body;
     let login = {
@@ -117,7 +109,6 @@ router.post('/', function (req, res, next) {
 
 // 用户登录
 router.post('/login', function (req, res, next) {
-    console.log(456);
     let user = req.body;
     mysql.query(`select u.*,l.password from login l,user u where u.username=?
                     and l.password=?`,
