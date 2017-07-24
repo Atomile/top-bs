@@ -48,13 +48,33 @@ router.get('/:val', function (req, res) {
     });
 });
 
+// 查询是否已收藏某新闻
+router.post('/ishas', function (req, res) {
+    mysql.query('select * from collect where mobile=? and news_id=?',
+        [req.body.mobile, req.body.news_id], (err, result) => {
+            console.log(result);
+            if (result.length > 0) {
+                res.send({success: true})
+            } else {
+                res.send({success: false})
+            }
+        })
+})
+
 // 收藏某条新闻
 router.post('/news', function (req, res) {
     mysql.query('insert into collect set ?', req.body, (err, result) => {
-        err ? console.log(err.message) : res.send({success: true});
+        err ? res.send({success: false}) : res.send({success: true});
     })
 })
-
+// 取消收藏某条新闻
+router.post('/del_collect', function (req, res) {
+    console.log(req.body)
+    mysql.query('delete from collect where mobile=? and news_id=?',
+        [req.body.mobile, req.body.news_id], (err, result) => {
+            err ? res.send({success: false}) : res.send({success: true});
+        })
+})
 // 新用户注册
 router.post('/', function (req, res, next) {
     console.log(123);
@@ -73,19 +93,17 @@ router.post('/', function (req, res, next) {
     console.log(reg['password'])
     // 写入到 user 表
     mysql.query(`select * from login where username=?`, reg.username, (err, result) => {
-        if (result[0]) {          // 检测用户名
-            // console.log(result[0],'该用户名已被注册');
+        if (result[0]) {            // 检测用户名
             return res.send({result: 'nameExit'});
-        } else {                  // 检测手机号码（主键）
+        } else {                    // 检测手机号码（主键）
             mysql.query(`select * from login where mobile=?`, reg.mobile, (err, result) => {
                 if (result[0]) {
-                    // console.log(result[0], '该手机号已被注册');
                     return res.send({result: 'mobileExit'});
                 } else {
                     mysql.query(`insert into user set ?`, reg, (err) => {
                         if (err) {
-                            // console.log('user --> 失败')
-                        } else {       // 写入到login
+                            console.log('user --> 失败')
+                        } else {    // 写入到login
                             mysql.query(`insert into login set ?`, login, (err) => {
                                 err ? console.log('login --> 失败') : res.send({result: true});
                             })
