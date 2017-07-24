@@ -18,7 +18,7 @@ router.get('/', function (req, res) {
     });
 });
 
-router.get('/:page', function (req, res) {
+router.get('/page/:page', function (req, res) {
     let page = req.params.page;
     let size = 15;
 
